@@ -1,0 +1,138 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Sarabun', sans-serif;
+}
+
+.header-title {
+    font-weight: 600;
+}
+
+.content-section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.leave-stats {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.chart-container {
+    height: 300px;
+    margin-bottom: 20px;
+}
+
+.badge-leave-type {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+.leave-request-item {
+    border-left: 4px solid #ffc107;
+    padding-left: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.leave-request-item:hover {
+    background-color: #f8f9fa;
+}
+
+.leave-history-item {
+    border-left: 4px solid #2575fc;
+    padding-left: 15px;
+    margin-bottom: 15px;
+}
+
+.leave-history-item.approved {
+    border-left-color: #28a745;
+}
+
+.leave-history-item.pending {
+    border-left-color: #ffc107;
+}
+
+.leave-history-item.rejected {
+    border-left-color: #dc3545;
+}
+
+.nav-tabs .nav-link.active {
+    border-bottom: 3px solid #2575fc;
+    font-weight: bold;
+}
+
+.employee-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.approval-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.calendar-view {
+    height: 450px;
+    overflow-y: auto;
+}
+
+.calendar-day {
+    height: 100px;
+    border: 1px solid #dee2e6;
+    padding: 5px;
+    position: relative;
+}
+
+.calendar-day.current-month {
+    background-color: #fff;
+}
+
+.calendar-day.other-month {
+    background-color: #f8f9fa;
+}
+
+.calendar-day.today {
+    background-color: #e8f4ff;
+}
+
+.calendar-day .date {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.leave-indicator {
+    border-radius: 4px;
+    padding: 2px 5px;
+    margin-bottom: 2px;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.staff-summary {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.staff-summary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

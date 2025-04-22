@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+  <!-- Header -->
+  <header class="bg-dark text-white p-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <img src="{{ url_for('static', filename='image/icon/dashboard.png') }}" alt="Icon" class="dashboard-icon">
+        <h4 class="header-title mb-0">สถิติการลางาน</h4>
+      </div>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light">Login</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container my-5">
+    <div class="d-flex flex-wrap justify-content-between gap-3">
+      <!-- สถิติการลางาน -->
+      <div class="custom-box flex-grow-1">
+        <h2 class="custom-title">สถิติการลางาน</h2>
+        <ul class="custom-list">
+          <li>คำขอลาทั้งหมด: 50</li>
+          <li>คำขอลาที่อนุมัติแล้ว: 30</li>
+          <li>คำขอลาที่รอการอนุมัติ: 15</li>
+          <li>คำขอลาที่ถูกปฏิเสธ: 5</li>
+        </ul>
+      </div>
+
+      <!-- ประเภทการลา -->
+      <div class="custom-box flex-grow-1">
+        <h2 class="custom-title">ประเภทการลา</h2>
+        <ul class="custom-list">
+          <li>ลาป่วย: 20</li>
+          <li>ลากิจ: 15</li>
+          <li>ลาพักร้อน: 15</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- กราฟสถิติ -->
+    <div class="my-5 p-4 graph-container">
+      <h2 class="text-center mb-4">กราฟสถิติการลา</h2>
+
+      <!-- Checkbox สำหรับเลือกประเภทการลา -->
+      <div class="mb-3 text-center">
+        <label class="form-check-label me-3">
+          <input type="checkbox" class="form-check-input" id="sickLeave" checked> ลาป่วย
+        </label>
+        <label class="form-check-label me-3">
+          <input type="checkbox" class="form-check-input" id="personalLeave" checked> ลากิจ
+        </label>
+        <label class="form-check-label">
+          <input type="checkbox" class="form-check-input" id="vacationLeave" checked> ลาพักร้อน
+        </label>
+      </div>
+
+      <!-- กราฟ -->
+      <div class="chart-wrapper">
+        <canvas id="leaveChart"></canvas>
+      </div>
+    </div>
+
+    <!-- รายชื่อพนักงานที่ลาวันนี้ -->
+    <div class="my-5 employee-list-container">
+      <h2 class="text-center employee-list-title">พนักงานที่ลาวันนี้</h2>
+      <table class="table table-striped table-hover employee-table">
+        <thead class="table-dark">
+          <tr>
+            <th>ชื่อพนักงาน</th>
+            <th>ประเภทการลา</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>สมชาย ใจดี</td>
+            <td>ลาป่วย</td>
+            <td class="text-success">อนุมัติแล้ว</td>
+          </tr>
+          <tr>
+            <td>สมหญิง ขยัน</td>
+            <td>ลากิจ</td>
+            <td class="text-warning">รอการอนุมัติ</td>
+          </tr>
+          <tr>
+            <td>สมพร นอน</td>
+            <td>ลาพักร้อน</td>
+            <td class="text-danger">ไม่ผ่าน</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer text-center py-4 bg-dark text-white">
+    <p class="mb-0">© 2025 ระบบจัดการลางาน | <a href="#" class="text-decoration-none text-info">นโยบายความเป็นส่วนตัว</a></p>
+  </footer>
+
+  <!-- Chart.js Script -->
+  <script>
+    // ข้อมูลเริ่มต้นของกราฟ
+    const chartData = {
+      labels: ['ลาป่วย', 'ลากิจ', 'ลาพักร้อน'],
+      datasets: [{
+        label: 'จำนวนการลา',
+        data: [20, 15, 15],
+        backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56']
+      }]
+    };
+
+    // ตัวเลือกของกราฟ
+    const chartOptions = {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false // ซ่อน Legend
+        },
+      }
+    };
+
+    // สร้างกราฟ
+    const ctx = document.getElementById('leaveChart').getContext('2d');
+    const leaveChart = new Chart(ctx, {
+      type: 'bar',
+      data: chartData,
+      options: chartOptions
+    });
+
+    // ฟังก์ชันอัปเดตกราฟตามการเลือก
+    function updateChart() {
+      const sickLeave = document.getElementById('sickLeave').checked;
+      const personalLeave = document.getElementById('personalLeave').checked;
+      const vacationLeave = document.getElementById('vacationLeave').checked;
+
+      // อัปเดตข้อมูลในกราฟ
+      leaveChart.data.datasets[0].data = [
+        sickLeave ? 20 : 0, // ลาป่วย
+        personalLeave ? 15 : 0, // ลากิจ
+        vacationLeave ? 15 : 0 // ลาพักร้อน
+      ];
+
+      leaveChart.update(); // อัปเดตกราฟ
+    }
+
+    // เพิ่ม Event Listener ให้ Checkbox
+    document.getElementById('sickLeave').addEventListener('change', updateChart);
+    document.getElementById('personalLeave').addEventListener('change', updateChart);
+    document.getElementById('vacationLeave').addEventListener('change', updateChart);
+  </script>
+</body>
+</html>

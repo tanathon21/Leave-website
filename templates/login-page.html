@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login & Register</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        .form-container {
+            max-width: 400px;
+            width: 100%;
+            padding: 2rem;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            background: white;
+        }
+
+        .form-container img {
+            max-width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto 1rem;
+        }
+
+        .toggle-btn {
+            cursor: pointer;
+            color: #0d6efd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <!-- Logo -->
+        <div class="text-center mb-4">
+            <img src="{{ url_for('static', filename='image/logo/logo.png') }}" alt="Logo">
+            <h3 class="text-center mb-4" id="form-title">Login</h3>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" method="POST" action="{{ url_for('auth.login') }}" class="{% if show_register %}d-none{% endif %}">
+            <div class="mb-3">
+                <label for="loginEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="loginEmail" name="email" placeholder="Enter your email"
+                    value="{{ email | default('') }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="loginPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="loginPassword" name="password"
+                    placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" method="POST" action="{{ url_for('auth.register') }}" class="{% if not show_register %}d-none{% endif %}">
+            <div class="mb-3">
+                <label for="registerTitle" class="form-label">Title</label>
+                <select class="form-select" id="registerTitle" name="title" required>
+                    <option value="Mr." {% if title == "Mr." %}selected{% endif %}>นาย</option>
+                    <option value="Ms." {% if title == "Ms." %}selected{% endif %}>นางสาว</option>
+                    <option value="Mrs." {% if title == "Mrs." %}selected{% endif %}>นาง</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="registerFirstName" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="registerFirstName" name="first_name"
+                    placeholder="Enter your first name" value="{{ first_name | default('') }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="registerSurname" class="form-label">Surname</label>
+                <input type="text" class="form-control" id="registerSurname" name="surname"
+                    placeholder="Enter your surname" value="{{ surname | default('') }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="registerEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="registerEmail" name="email" placeholder="Enter your email"
+                    value="{{ email | default('') }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="registerPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="registerPassword" name="password"
+                    placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Register</button>
+        </form>
+
+        <!-- Back to Home Button -->
+        <div class="text-center mt-3">
+            <a href="{{ url_for('views.home') }}" class="btn btn-secondary w-100">Back to Home</a>
+        </div>
+
+        <!-- Toggle Link -->
+        <div class="text-center mt-3">
+            <small class="toggle-btn" onclick="toggleForm()">Don't have an account? Register</small>
+        </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <script>
+            Swal.fire({
+                icon: "{{ category }}",
+                title: "{{ 'Success' if category == 'success' else 'Error' }}",
+                text: "{{ message }}",
+            });
+        </script>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const formTitle = document.getElementById('form-title');
+
+        function toggleForm() {
+            loginForm.classList.toggle('d-none');
+            registerForm.classList.toggle('d-none');
+            if (loginForm.classList.contains('d-none')) {
+                formTitle.textContent = 'Register';
+                toggleBtn.textContent = 'Already have an account? Login';
+            } else {
+                formTitle.textContent = 'Login';
+                toggleBtn.textContent = "Don't have an account? Register";
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // รับข้อความแจ้งเตือนจากเซิร์ฟเวอร์
+        const message = "{{ message | safe }}";
+        const category = "{{ category | safe }}";
+
+        if (message) {
+            Swal.fire({
+                icon: category === 'success' ? 'success' : 'error',
+                title: category === 'success' ? 'Success' : 'Error',
+                text: message,
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,151 @@
+header {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* เพิ่มเงา */
+    background-color: #343a40; /* พื้นหลังสีเข้ม */
+    position: sticky; /* ทำให้ Header ติดอยู่ด้านบน */
+    top: 0; /* ตำแหน่งด้านบน */
+    z-index: 1000; /* ความสำคัญของเลเยอร์ */
+  }
+
+  .dashboard-icon {
+    width: 50px; /* กำหนดความกว้าง */
+    height: auto; /* ให้ปรับความสูงอัตโนมัติตามอัตราส่วน */
+  }
+
+  .header-title {
+    font-size: 1.25rem; /* ขนาดตัวอักษร */
+    font-weight: bold; /* ตัวหนา */
+    color: #fff; /* สีตัวอักษร */
+    margin-left: 10px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
+  }
+
+  .btn-outline-light {
+    border-color: #fff; /* สีขอบปุ่ม */
+    color: #fff; /* สีข้อความปุ่ม */
+    transition: background-color 0.3s ease, color 0.3s ease; /* เอฟเฟกต์เมื่อโฮเวอร์ */
+  }
+
+  .btn-outline-light:hover {
+    background-color: #fff; /* สีพื้นหลังเมื่อโฮเวอร์ */
+    color: #343a40; /* สีข้อความเมื่อโฮเวอร์ */
+  }
+
+  .row {
+    gap: 30px; /* เพิ่มระยะห่างระหว่างกล่อง */
+  }
+
+  .custom-box {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* เพิ่มเงา */
+    padding: 20px; /* เพิ่มระยะห่างภายใน */
+    border-radius: 12px; /* มุมโค้งมน */
+    background-color: #f9f9f9; /* พื้นหลังสีเทาอ่อน */
+    margin-bottom: 20px; /* เพิ่มระยะห่างด้านล่าง */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* เพิ่มเอฟเฟกต์เมื่อโฮเวอร์ */
+    min-width: 200px; /* กำหนดความกว้างขั้นต่ำ */
+  }
+
+  .custom-box:hover {
+    transform: translateY(-5px); /* ยกกล่องขึ้นเล็กน้อย */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* เพิ่มเงาเมื่อโฮเวอร์ */
+  }
+
+  .custom-title {
+    font-size: 1.5rem; /* ขนาดตัวอักษร */
+    font-weight: bold; /* ตัวหนา */
+    color: #333; /* สีตัวอักษร */
+    margin-bottom: 15px; /* ระยะห่างด้านล่าง */
+  }
+
+  .custom-list {
+    list-style-type: none; /* ลบจุดหน้ารายการ */
+    padding: 0; /* ลบระยะห่างด้านใน */
+  }
+
+  .custom-list li {
+    font-size: 1rem; /* ขนาดตัวอักษร */
+    color: #555; /* สีตัวอักษร */
+    margin-bottom: 10px; /* ระยะห่างระหว่างรายการ */
+  }
+
+  .graph-container {
+    background-color: #f9f9f9; /* พื้นหลังสีเทาอ่อน */
+    border-radius: 12px; /* มุมโค้งมน */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+  }
+
+  .chart-wrapper {
+    max-width: 600px; /* กำหนดความกว้างสูงสุดของกราฟ */
+    margin: 0 auto; /* จัดให้อยู่ตรงกลาง */
+  }
+
+  h2 {
+    font-size: 1.75rem; /* ขนาดตัวอักษรหัวข้อ */
+    font-weight: bold; /* ตัวหนา */
+    color: #333; /* สีตัวอักษร */
+  }
+
+  .form-check-label {
+    font-size: 1rem; /* ขนาดตัวอักษร */
+    color: #555; /* สีตัวอักษร */
+  }
+
+  .form-check-input {
+    margin-right: 5px; /* ระยะห่างระหว่าง Checkbox กับข้อความ */
+  }
+
+  .employee-list-container {
+    background-color: #f9f9f9; /* พื้นหลังสีเทาอ่อน */
+    border-radius: 12px; /* มุมโค้งมน */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+    padding: 20px; /* ระยะห่างภายใน */
+  }
+
+  .employee-list-title {
+    font-size: 1.75rem; /* ขนาดตัวอักษร */
+    font-weight: bold; /* ตัวหนา */
+    color: #333; /* สีตัวอักษร */
+    margin-bottom: 20px; /* ระยะห่างด้านล่าง */
+  }
+
+  .employee-table {
+    margin: 0 auto; /* จัดให้อยู่ตรงกลาง */
+    width: 100%; /* ใช้ความกว้างเต็ม */
+    border-collapse: collapse; /* ลบเส้นขอบซ้อน */
+  }
+
+  .employee-table th, .employee-table td {
+    text-align: left; /* จัดข้อความชิดซ้าย */
+    vertical-align: middle; /* จัดข้อความให้อยู่ตรงกลางแนวตั้ง */
+    padding: 10px; /* เพิ่มระยะห่างภายในเซลล์ */
+  }
+
+  .employee-table thead {
+    background-color: #343a40; /* พื้นหลังหัวตาราง */
+    color: #fff; /* สีตัวอักษรหัวตาราง */
+  }
+
+  .employee-table tbody tr:hover {
+    background-color: #f1f1f1; /* เปลี่ยนสีพื้นหลังเมื่อโฮเวอร์ */
+  }
+
+  .text-success {
+    color: #28a745; /* สีเขียวสำหรับสถานะอนุมัติ */
+  }
+
+  .text-warning {
+    color: #ffc107; /* สีเหลืองสำหรับสถานะรอการอนุมัติ */
+  }
+
+  .footer {
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1); /* เพิ่มเงาด้านบน */
+    background-color: #343a40; /* พื้นหลังสีเข้ม */
+    color: #fff; /* สีข้อความ */
+  }
+
+  .footer a {
+    color: #17a2b8; /* สีลิงก์ */
+    transition: color 0.3s ease; /* เอฟเฟกต์เมื่อโฮเวอร์ */
+  }
+
+  .footer a:hover {
+    color: #0dcaf0; /* สีลิงก์เมื่อโฮเวอร์ */
+  }

@@ -1,0 +1,504 @@
+<!-- manager.html -->
+<!-- This is a template for the Manager/HR leave management system. It includes sections for leave requests, calendar, statistics, and a form for submitting leave requests. The layout is responsive and uses Bootstrap for styling. -->
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบลางาน - หัวหน้างาน/HR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Manager.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="bg-dark text-white p-3 sticky-top">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <h4 class="header-title mb-0">ระบบลางาน</h4>
+                </div>
+                <div class="col-md-4 text-center">
+                    {% if current_user.is_authenticated %}
+                    <h5 class="text-white mb-0">ผู้ใช้งาน {{ current_user.first_name }} {{ current_user.surname }} ({{
+                        current_user.role }})</h5>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">ออกจากระบบ</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        <!-- สรุปข้อมูล -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="leave-stats">
+                    <h4>คำขอลารออนุมัติ</h4>
+                    <h2 class="display-4 mb-0">{{ pending_count }}</h2>
+                    <p>ต้องอนุมัติภายใน 2 วัน</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="leave-stats">
+                    <h4>พนักงานลาวันนี้</h4>
+                    <h2 class="display-4 mb-0">{{ on_leave_today }}</h2>
+                    <p>จาก {{ total_employees }} คน</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="leave-stats">
+                    <h4>วันลาของคุณ</h4>
+                    <h2 class="display-4 mb-0">{{ current_user.vacation_leave_quota }}</h2>
+                    <p>วันลาพักร้อนคงเหลือ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- แท็บเมนู -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" href="#approval" data-bs-toggle="tab">
+                    <i class="bi bi-check-square"></i> อนุมัติการลา
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#calendar" data-bs-toggle="tab">
+                    <i class="bi bi-calendar-week"></i> ปฏิทินการลา
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#stats" data-bs-toggle="tab">
+                    <i class="bi bi-bar-chart"></i> สถิติการลา
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#request" data-bs-toggle="tab">
+                    <i class="bi bi-pencil-square"></i> ขอลางาน
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- แท็บอนุมัติการลา -->
+            <div class="tab-pane fade show active" id="approval">
+                <div class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>คำขอลารออนุมัติ</h3>
+                        <div>
+                            <button class="btn btn-outline-primary btn-sm me-2"><i class="bi bi-funnel"></i>
+                                กรอง</button>
+                            <button class="btn btn-outline-success btn-sm"><i class="bi bi-file-earmark-excel"></i>
+                                ส่งออก</button>
+                        </div>
+                    </div>
+
+                    <!-- รายการคำขอลา -->
+                    {% if pending_leaves %}
+                    {% for leave in pending_leaves %}
+                    <div class="leave-request-item p-3" id="leave-{{ leave.id }}">
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="employee-avatar">{{ leave.employee.first_name[0] }}{{
+                                    leave.employee.surname[0] }}</div>
+                                <div>
+                                    <h5 class="mb-0">{{ leave.employee.first_name }} {{ leave.employee.surname }}</h5>
+                                    {% if leave.leave_type == 'sick' %}
+                                    <span class="badge bg-primary">ลาป่วย</span>
+                                    {% elif leave.leave_type == 'personal' %}
+                                    <span class="badge bg-success">ลากิจ</span>
+                                    {% elif leave.leave_type == 'vacation' %}
+                                    <span class="badge bg-warning text-dark">ลาพักร้อน</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">อื่นๆ</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="approval-actions">
+                                <form action="{{ url_for('views.approve_leave', leave_id=leave.id) }}" method="post"
+                                    class="d-inline">
+                                    <button class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i>
+                                        อนุมัติ</button>
+                                </form>
+                                <form action="{{ url_for('views.reject_leave', leave_id=leave.id) }}" method="post"
+                                    class="d-inline">
+                                    <button class="btn btn-danger btn-sm"><i class="bi bi-x-lg"></i> ปฏิเสธ</button>
+                                </form>
+                                <button class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#leaveDetailModal" data-leave-id="{{ leave.id }}">
+                                    <i class="bi bi-eye"></i> รายละเอียด
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-muted mb-1">
+                                {{ leave.start_date.strftime('%d %b %Y') }} - {{ leave.end_date.strftime('%d %b %Y') }}
+                                ({{ leave.total_days }} วัน)
+                            </p>
+                            <p class="mb-0">เหตุผล: {{ leave.reason }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="alert alert-info">ไม่มีคำขอลารออนุมัติในขณะนี้</div>
+                    {% endif %}
+
+                    {% if pages is defined and pages > 1 %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                                <a class="page-link"
+                                    href="{{ url_for('views.manager', page=page-1) if page > 1 else '#' }}">ก่อนหน้า</a>
+                            </li>
+                            {% for p in range(1, pages + 1) %}
+                            <li class="page-item {% if p == page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('views.manager', page=p) }}">{{ p }}</a>
+                            </li>
+                            {% endfor %}
+                            <li class="page-item {% if page == pages %}disabled{% endif %}">
+                                <a class="page-link"
+                                    href="{{ url_for('views.manager', page=page+1) if page < pages else '#' }}">ถัดไป</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- แท็บปฏิทินการลา -->
+            <div class="tab-pane fade" id="calendar">
+                <div class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>ปฏิทินการลาประจำเดือน {{ current_month_name }} {{ current_year }}</h3>
+                        <div>
+                            <a href="{{ url_for('views.manager', month=prev_month, year=prev_year) }}"
+                                class="btn btn-outline-secondary btn-sm me-2">
+                                <i class="bi bi-arrow-left"></i>
+                            </a>
+                            <a href="{{ url_for('views.manager') }}"
+                                class="btn btn-outline-primary btn-sm">เดือนปัจจุบัน</a>
+                            <a href="{{ url_for('views.manager', month=next_month, year=next_year) }}"
+                                class="btn btn-outline-secondary btn-sm ms-2">
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="calendar-view">
+                        <div class="row text-center fw-bold mb-2">
+                            <div class="col">จันทร์</div>
+                            <div class="col">อังคาร</div>
+                            <div class="col">พุธ</div>
+                            <div class="col">พฤหัส</div>
+                            <div class="col">ศุกร์</div>
+                            <div class="col">เสาร์</div>
+                            <div class="col">อาทิตย์</div>
+                        </div>
+
+                        {% for week in calendar_weeks %}
+                        <div class="row mb-2">
+                            {% for day in week %}
+                            <div
+                                class="col calendar-day {% if day.current_month %}current-month{% else %}other-month{% endif %} {% if day.is_today %}today{% endif %}">
+                                <div class="date">{{ day.day }}</div>
+                                {% if day.leaves %}
+                                {% for leave in day.leaves %}
+                                <div class="leave-indicator 
+                                        {% if leave.leave_type == 'sick' %}bg-primary text-white
+                                        {% elif leave.leave_type == 'personal' %}bg-success text-white
+                                        {% elif leave.leave_type == 'vacation' %}bg-warning text-dark
+                                        {% else %}bg-secondary text-white{% endif %}">
+                                    {{ leave.employee.first_name }} -
+                                    {% if leave.leave_type == 'sick' %}ลาป่วย
+                                    {% elif leave.leave_type == 'personal' %}ลากิจ
+                                    {% elif leave.leave_type == 'vacation' %}ลาพักร้อน
+                                    {% else %}ลาอื่นๆ{% endif %}
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                                {% if day.is_today %}
+                                <div class="leave-indicator bg-warning text-dark">วันนี้</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="d-flex gap-2 justify-content-center">
+                            <span class="badge bg-primary">ลาป่วย</span>
+                            <span class="badge bg-success">ลากิจ</span>
+                            <span class="badge bg-warning text-dark">ลาพักร้อน</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- แท็บสถิติการลา -->
+            <div class="tab-pane fade" id="stats">
+                <div class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>สถิติการลาของทีม</h3>
+                        <div>
+                            <select class="form-select form-select-sm" id="statYear"
+                                onchange="window.location='{{ url_for('views.manager') }}?stat_year='+this.value">
+                                {% for year in available_years %}
+                                <option value="{{ year }}" {% if year==current_year %}selected{% endif %}>ปี {{ year }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="departmentChart"></canvas>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="mb-3">สรุปข้อมูลรายบุคคล</h5>
+                    <div class="row">
+                        {% for user in team_members %}
+                        <div class="col-md-3 mb-3">
+                            <div class="card staff-summary">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ user.first_name }} {{ user.surname }}</h6>
+                                    <p class="card-text text-muted">{{ user.department }}</p>
+                                    <div class="progress mb-2" style="height: 5px;">
+                                        {% set used_leaves = user.sick_used + user.personal_used + user.vacation_used %}
+                                        {% set total_leaves = user.sick_leave_quota + user.personal_leave_quota +
+                                        user.vacation_leave_quota %}
+                                        {% set percentage = (used_leaves / total_leaves * 100) if total_leaves > 0 else
+                                        0 %}
+                                        <div class="progress-bar bg-primary" style="width: {{ percentage }}%"></div>
+                                    </div>
+                                    <small>ลาแล้ว {{ used_leaves }}/{{ total_leaves }} วัน</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('views.detailed_report') }}"
+                            class="btn btn-outline-primary">ดูรายงานละเอียด</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- แท็บขอลางาน -->
+            <div class="tab-pane fade" id="request">
+                <div class="content-section">
+                    <h3 class="mb-4">ขอลางาน</h3>
+
+                    <form method="POST" action="{{ url_for('views.manager_leave_request') }}"
+                        enctype="multipart/form-data">
+                        {{ form.csrf_token }}
+                        <div class="mb-3">
+                            <label for="leaveType" class="form-label">ประเภทการลา</label>
+                            <select class="form-select" id="leaveType" name="leave_type" required>
+                                <option value="" selected disabled>กรุณาเลือกประเภทการลา</option>
+                                <option value="sick">ลาป่วย</option>
+                                <option value="personal">ลากิจ</option>
+                                <option value="vacation">ลาพักร้อน</option>
+                            </select>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">วันที่เริ่มต้น</label>
+                                <input type="date" class="form-control" id="startDate" name="start_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">วันที่สิ้นสุด</label>
+                                <input type="date" class="form-control" id="endDate" name="end_date" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">เหตุผลการลา</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contactInfo" class="form-label">ข้อมูลติดต่อระหว่างลา</label>
+                            <input type="text" class="form-control" id="contactInfo" name="contact_info"
+                                placeholder="เบอร์โทรศัพท์หรืออีเมล">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">การมอบหมายงาน</label>
+                            <div class="card p-3 bg-light">
+                                <div class="mb-3">
+                                    <label for="assignTo" class="form-label">มอบหมายงานให้</label>
+                                    <select class="form-select" id="assignTo" name="assign_to">
+                                        <option value="" selected disabled>เลือกพนักงานที่จะรับผิดชอบงานแทน</option>
+                                        {% for user in team_members %}
+                                        {% if user.id != current_user.id %}
+                                        <option value="{{ user.id }}">{{ user.first_name }} {{ user.surname }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="workDetails" class="form-label">รายละเอียดงานที่มอบหมาย</label>
+                                    <textarea class="form-control" id="workDetails" name="work_details"
+                                        rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fileAttachment" class="form-label">แนบเอกสาร (ถ้ามี)</label>
+                            <input class="form-control" type="file" id="fileAttachment" name="attachment">
+                            <div class="form-text">แนบเอกสารรับรองแพทย์หรือเอกสารที่เกี่ยวข้อง (สูงสุด 5MB)</div>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="confirmCheck" required>
+                            <label class="form-check-label"
+                                for="confirmCheck">ข้าพเจ้าขอรับรองว่าข้อมูลทั้งหมดเป็นความจริง</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">ส่งคำขอลางาน</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal รายละเอียดการลา -->
+    <div class="modal fade" id="leaveDetailModal" tabindex="-1" aria-labelledby="leaveDetailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="leaveDetailModalLabel">รายละเอียดการลา</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="leaveDetailContent">
+                    <!-- ข้อมูลจะถูกเติมด้วย AJAX/JavaScript เมื่อเปิด Modal -->
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">กำลังโหลด...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <form id="rejectLeaveForm" method="post" class="d-inline me-auto">
+                        <input type="hidden" name="csrf_token" value="{{ form.csrf_token._value() }}">
+                        <button type="submit" class="btn btn-danger">ปฏิเสธการลา</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <form id="approveLeaveForm" method="post" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ form.csrf_token._value() }}">
+                        <button type="submit" class="btn btn-success">อนุมัติการลา</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ส่วน JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // สร้างกราฟแสดงสถิติการลาตามแผนก
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('departmentChart').getContext('2d');
+
+            // ข้อมูลจาก Flask
+            const departmentData = {{ departments_data| tojson
+        }};
+
+        const departmentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: departmentData.departments,
+                datasets: [
+                    {
+                        label: 'ลาป่วย',
+                        data: departmentData.sick,
+                        backgroundColor: '#0d6efd'
+                    },
+                    {
+                        label: 'ลากิจ',
+                        data: departmentData.personal,
+                        backgroundColor: '#198754'
+                    },
+                    {
+                        label: 'ลาพักร้อน',
+                        data: departmentData.vacation,
+                        backgroundColor: '#ffc107'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: false
+                    },
+                    y: {
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // ตรวจสอบวันที่เริ่มต้นและสิ้นสุด
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+
+        if (startDate && endDate) {
+            startDate.addEventListener('change', function () {
+                endDate.min = startDate.value;
+                if (endDate.value && endDate.value < startDate.value) {
+                    endDate.value = startDate.value;
+                }
+            });
+        }
+
+        จากโค้ด JavaScript ที่คุณให้มา คุณกำลังดึงข้อมูลรายละเอียดการลาผ่าน AJAX เมื่อ Modal ถูกเปิดใช้งาน อย่างไรก็ตาม คุณยังไม่ได้เพิ่มพารามิเตอร์ page เข้าไปใน URL ที่ใช้ในการดึงข้อมูล
+
+วิธีแก้ไขคือ เพิ่ม ?page=1 (หรือค่าเริ่มต้นของหน้า) เข้าไปใน URL ที่ใช้ในคำสั่ง fetch:
+
+JavaScript
+
+// โหลดข้อมูลรายละเอียดการลาเมื่อเปิด Modal
+const leaveDetailModal = document.getElementById('leaveDetailModal');
+if (leaveDetailModal) {
+    leaveDetailModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const leaveId = button.getAttribute('data-leave-id');
+        const modalContent = document.getElementById('leaveDetailContent');
+
+        // ตั้งค่า URL สำหรับฟอร์มการอนุมัติและปฏิเสธ
+        const approveUrlBase = "{{ url_for('views.approve_leave', leave_id=0).replace('0', '') }}";
+        const rejectUrlBase = "{{ url_for('views.reject_leave', leave_id=0).replace('0', '') }}";
+
+        document.getElementById('approveLeaveForm').action = approveUrlBase + leaveId;
+        document.getElementById('rejectLeaveForm').action = rejectUrlBase + leaveId;
+
+        // โหลดข้อมูลรายละเอียดการลา โดยเพิ่มพารามิเตอร์ page
+        const detailUrlBase = "{{ url_for('views.leave_detail', leave_id=0).replace('0', '') }}";
+        fetch(detailUrlBase + leaveId + '?page=1') // เพิ่ม '?page=1' ที่นี่
+            .then(response => response.text())
+            .then(data => {
+                modalContent.innerHTML = data;
+            })
+            .catch(error => {
+                modalContent.innerHTML = '<div class="alert alert-danger">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+                console.error('Error:', error);
+            });
+    });
+}
+        });
+    </script>
+</body>
+
+</html>
